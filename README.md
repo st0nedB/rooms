@@ -5,15 +5,17 @@ Hello,
 I'd like to introduce to you a project I have been working on during the last few weeks. Its focus is the localization of mobile devices using low-cost COTS hardware, i.e. the ESP32. By configuring and deploying multiple ESP32's as iBeacon transmitters into a region (e.g. an apartment, house, etc.), a mobile app on the device can detect in which room/area of the region the device currently is. It then uses MQTT to publish the determined region to an MQTT broker. The current room/region is estimated from the RSSI values obtained from all beacons in range.
 
 **Why?**
+
 I started the project because I wanted a BLE solution to detect in which room of my flat my devices are. Among the existing solutions, I found *monitor* and *room-assistant* to be the most promising ones.
 One drawback for me was the required hardware. My apartment has six rooms, and equipping each of the rooms with an RPi Zero was not feasible, mainly due to the limited deliverable quantities here in Germany (only 1 per order).
 
 **How?**
+
 I found the ESP32 to be a promising alternative. It has Wifi and BLE build-in, is available for 6-8€, depending on quantity and supplier, and can easily be converted to an iBeacon using *espHome*. Furthermore, I also use it for other sensors (e.g. moisture, light, temperature, etc.). So I still had a bunch of them lying around.
 My first idea was to utilize the ESP32's as passive BLE sensors to monitor the advertisements of devices. But, as some may know from the discussions surrounding the current COVID-19 tracing apps,  almost all mobile device manufacturers periodically change the broadcast MAC address, making it hard to identify and track devices. While surely some (maybe complicated) tricks are possible, I didn't want to work around privacy-preserving mechanisms.
 Being fully aware of the power consumption drawback of on-device solutions, I still decided to try and see if it works and how large the battery impact truly is.
 Regarding the processing, I decided to go with a Machine Learning-based approach. By doing so, overlapping coverage areas of beacons are beneficial instead of harmful. The additional diversity helps to provide more accurate, and stable predictions. Hence beacon positions can be chosen more freely, e.g. near power outlets at convenient locations.
-![explanaition|582x500](upload://6YNs2PI0qroVvp4ehURIPoduWVU.png) 
+[explanation image]
 
 **Setup procedure**
 The initial setup procedures for the system will be as follows:
@@ -23,16 +25,19 @@ Next, the data must be exported from the app to a local computer. Using two simp
 That's it. The app can now estimate the current room in which the device is. By configuring an MQTT broker and topic of choice, each room change will be pushed to the broker.
 
 **Demo**
+
 Here a short demo GIFs showing the capabilities to control light scenes in combination with some simple Home Assistant automation (room labels are in German ;) ). Many more use cases are possible, e.g. triggering automation if the device is placed on a shelf/table.
 The delay is usually in the order of 1-2 seconds.
-https://imgur.com/a/80EmbCg
+[demo gif]
 
 **Open Issues**
+
 Of course, there are also some issues. The most important one is the power consumption. Constant beacon ranging in the background will drain the device battery quicker. However, I consider this an open topic for further optimizations. Simple measures can be implemented to counteract. For example, the app will suspend all measurements if the device is not moving or if the device leaves the specified beacon region (e.g. the house).
 Additionally, there are many use-cases where non-stop measurements in the background are not required. 
 Another issue is instability in the transition between two open areas where no physical separation (e.g. a wall or door) exists. There are techniques to stabilize the predictions in those cases, but implementing them will take further time.
 
 **So, why do this?**
+
 Honestly, I just wanted to know if it works and went from there. Now it is at a point where it fits my use personal use case and works reliably.  Which makes me wonder, whether it will also be useful for others?
 Therefore, the next step is to find a small circle of willing testers, who want to try it in their own home and help me improve it.
 Currently, the app works only on iOS devices with version 13 and above (I did not test/build for other versions yet).
