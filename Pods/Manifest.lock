@@ -1,0 +1,34 @@
+PODS:
+  - IQKeyboardManagerSwift (6.5.5)
+  - Moscapsule (0.6.4)
+  - OpenSSL-Universal (1.0.2.20):
+    - OpenSSL-Universal/Static (= 1.0.2.20)
+  - OpenSSL-Universal/Static (1.0.2.20)
+
+DEPENDENCIES:
+  - IQKeyboardManagerSwift
+  - Moscapsule (from `https://github.com/flightonary/Moscapsule.git`)
+  - OpenSSL-Universal
+
+SPEC REPOS:
+  trunk:
+    - IQKeyboardManagerSwift
+    - OpenSSL-Universal
+
+EXTERNAL SOURCES:
+  Moscapsule:
+    :git: https://github.com/flightonary/Moscapsule.git
+
+CHECKOUT OPTIONS:
+  Moscapsule:
+    :commit: dac89a1b5ad1163e88aaad2c2627dee4eea6e572
+    :git: https://github.com/flightonary/Moscapsule.git
+
+SPEC CHECKSUMS:
+  IQKeyboardManagerSwift: 0fb93310284665245591f50f7a5e38de615960b7
+  Moscapsule: 6bb834c60e24251897dc1cb2c4552fd674f887f3
+  OpenSSL-Universal: ff34003318d5e1163e9529b08470708e389ffcdd
+
+PODFILE CHECKSUM: 145071efb2a4bbe6b9313a85b97cf1a50aea08a3
+
+COCOAPODS: 1.9.1
