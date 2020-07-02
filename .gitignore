@@ -89,5 +89,10 @@ fastlane/test_output
 
 iOSInjectionProject/
 
-# Project specific
+## Project specific
+# mlmodel file
 *.mlmodel
+# graphic asset folder
+misc/
+# macos-specific
+.DS_Store
