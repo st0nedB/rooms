@@ -18,11 +18,11 @@ class SettingsViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var localizationAuthorizationTextView: UITextView!
     // Sampling Settings
     @IBOutlet weak var numSamplesTextField: UITextField!
-    var numCollectSamples:Int = 500
-     
+    var numCollectSamples:Int = 120
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        numCollectSamples = defaults.integer(forKey: "numCollectSamples") as Int? ?? 500
+        numCollectSamples = defaults.integer(forKey: "numCollectSamples") as Int? ?? 120
         numSamplesTextField.text = String(numCollectSamples)
         
         // inform the user about the always-authorization for the location
