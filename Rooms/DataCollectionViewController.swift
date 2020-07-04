@@ -116,7 +116,7 @@ class DataCollectionViewController: UIViewController, CLLocationManagerDelegate 
         // if enough samples have been collected, stop the ranging
         if iterCounter >= numSamples {
             stopRecording()
-            //tojson(object: measurements, filename: room + ".json") // write results to json file
+            dataFiles.tojson(object: measurements, filename: room + ".json") // write results to json file
         }
     }
     
