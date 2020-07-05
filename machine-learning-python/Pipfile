@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+coremltools = "*"
+jupyterlab = "*"
+numpy = "*"
+scipy = "*"
+keras = "==2.2.4"
+h5py = "*"
+ipykernel = "*"
+matplotlib = "*"
+pandas = "*"
+seaborn = "*"
+sklearn = "*"
+tensorflow = "==1.14.0"
+keras-tqdm = "*"
+
+[requires]
+python_version = "3.7"
