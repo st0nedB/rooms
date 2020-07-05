@@ -33,16 +33,17 @@ class beaconData {
         */
         
         // initialize some variables
-        var array: [Double] = Array(repeating: defaultRSSI, count: numBeacons)              // array of numBeacons x singleBeaconMeasurement
+        var array: [Double] = Array(repeating: 1, count: numBeacons)                        // array of numBeacons x singleBeaconMeasurement, 1 means the beacon is invisible (normalized with -100)
         var numSawBeacons: Int = 0                                                          // number of Beacons visible in the last measurement
         var beaconIdx: Int                                                                  // value in the beaconDict
-        // iterate over the found beacons and derive RSSI and proximity
+        // iterate over the found beacons and obtain RSSI
         for ( _, beacon) in beaconMeasurement.enumerated(){
             beaconIdx = beaconDict[String(Int(truncating: beacon.minor))]!                          // row indice for the beacon the measurementArray
             if beacon.rssi != 0 {
                 array[beaconIdx] = Double(beacon.rssi) / defaultRSSI                        // write RSSI into the measurementArray
             } else {
                 array[beaconIdx] = Double(1)                                                // if a beacon is invisible, it is sometimes reported with 0 RSSI
+                numSawBeacons -= 1                                                          // ensure the beacon isn't counted as visible then
             }
             numSawBeacons += 1                                                              // increment number of beacons in the report
         }
