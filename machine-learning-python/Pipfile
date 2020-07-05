@@ -17,7 +17,7 @@ matplotlib = "*"
 pandas = "*"
 seaborn = "*"
 sklearn = "*"
-tensorflow = "==1.14.0"
+tensorflow = "==1.15.2"
 keras-tqdm = "*"
 
 [requires]
