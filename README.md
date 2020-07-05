@@ -49,7 +49,7 @@ __5. Export the data and train your own AI__
 Once the data is collected for all rooms, you must export the data. The app generates on JSON file for each room with the collected samples.
 Pressing the _Export_ button will open the default iOS share dialogue and allow you to export your files.
 Export your files to where you can access them with your computer. 
-To train your model, copy the exported JSON files to the _machine-learning-python_ folder in the repository and run the script with the appropriate options (*--num-beacon* is the only required option).
+To train your model, copy the exported JSON files to the _machine-learning-python_ folder in the repository and run the script with the appropriate options (*--num-beacon* is the only required option). To setup the python environment, you can use "pipenv" with the provided pipfiles.
 Use *--help* to learn about the other options. 
 
 __6. Import the AI model back to the app__
