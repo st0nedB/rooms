@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // UserDefaults for the App
         let roomsUserDefaults = [
-            "numCollectSamples" : 500,
+            "numCollectSamples" : 120,
             "rooms" : ["Room 1", "Room 2"] as [String],
             "beaconUUID" : "db50b706-f209-4acd-b55d-427289535c8d",
             "beaconMajor" : 0,
