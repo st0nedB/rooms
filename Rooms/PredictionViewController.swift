@@ -181,22 +181,22 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         
         // the prediction with the model can fail due to invalid settings, i.e. when the settings were updated, but not the model
         do {
-            print("0")
+            print("Attempting prediction...")
             // attempt to make a prediction
             let output = try model.prediction(from: RoomsMlModelInput(dense_1_input_output: mlModelInput))
-            print("1")
+            print("Prediction succesful.")
             // get the predictions label
             let predRoom = String(output.featureValue(for: "classLabel")!.stringValue)
             
-            print("2")
+            print("Predicted Room: \(predRoom)")
             // calculate the prediction accuracy rounded to one decimal place
             let predProb = round( Double( truncating: output.featureValue(for: "output1")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
             
             // if the prediction probability exceeds a threshold, accept the prediction
-            print("3")
+            print("Prediction probability: \(predProb)")
             if predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove {
                 // update currentRoom
-                print("4")
+                print("Updating Rooms")
                 currentRoom = String(predRoom)
                 print(currentRoom)
                 
@@ -204,11 +204,11 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
                 labelRoom.text = currentRoom
                 labelPredictionLikelyhood.text = String(format: "%.2f %%", arguments: [predProb])
                     
-                print("5")
+                print("UI Elements updated...")
                 // send to mqtt broker
                 let json = ["room" : predRoom, "likelyhood": predProb] as [String : Any]
-                print("6")
                 publishToMQTTServer(mqttConfig: mqttConfig, message: json)
+                print("Updated MQTT")
             }
         } catch {
             stopPrediction(labelRoomText: "Invalid Model!", labelPredictionLikelyhoodtext:  "Please update in Settings.")
