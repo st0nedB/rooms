@@ -20,7 +20,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
     var model = MLModel()
     var modelValid = false
     var currentRoom:String = ""
-    var predictionThreshold = 0.7
+    var predictionThreshold = 0.1
     
     // Variables
     var numBeacons:Int = 0                               // number of beacons, will be updated when view is loaded
