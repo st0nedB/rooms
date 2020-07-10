@@ -191,12 +191,11 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
             let predProb = round( Double( truncating: output.featureValue(for: "output1")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
             
             print("Room \(predRoom), Likelihood \(predProb)")
-            print("This is \(fakeMove)")
             // if the prediction probability exceeds a threshold, accept the prediction
             if predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove {
                 // update currentRoom
                 currentRoom = String(predRoom)
-                print(currentRoom)
+                print("Current Room \(currentRoom)")
                 
                 // Update the UI Elements
                 labelRoom.text = currentRoom
