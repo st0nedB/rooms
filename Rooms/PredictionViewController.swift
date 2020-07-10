@@ -48,7 +48,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
     var accelerationVector:[Double] = [ 0, 0 ]    // used to store the last two measurements from the accelerometer
     var wasMovingUntil:Date = Date()  // used to indicate the last time the device moved
     let accelerationThreshold = 0.1  // threshold for the acceleration at which the prediction is started in [m/s^2]
-    let timeGrace = TimeInterval(5) // grace before the prediction is stopped after moving
+    let timeGrace = TimeInterval(2) // grace before the prediction is stopped after moving
     var fakeMove = false  // this variable indicates a fake move, it will only start location updates, but not beacon ranging
     
     // Background Task
@@ -136,22 +136,22 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         uuid = UUID(uuidString: defaults.string(forKey: "beaconUUID")!)!
         major = CLBeaconMajorValue(defaults.integer(forKey: "beaconMajor"))
         
+        // setup the motion manager
+        motionManager.deviceMotionUpdateInterval = 0.5
+        motionManager.startDeviceMotionUpdates(to: OperationQueue.current!, withHandler: userMotionHandler(data:error:))
+        
         // Setup the MQTT connection
-        let mqttConfig = MQTTConfig(
+        self.mqttConfig = MQTTConfig(
             clientId: defaults.string(forKey: "MQTTUsername")!,
             host: defaults.string(forKey: "MQTTIP")!,
             port: Int32(defaults.integer(forKey: "MQTTPort")),
             keepAlive: 5
         )
         
-        mqttConfig.mqttAuthOpts = MQTTAuthOpts(
+        self.mqttConfig.mqttAuthOpts = MQTTAuthOpts(
             username: defaults.string(forKey: "MQTTUsername")!,
             password: defaults.string(forKey: "MQTTPassword")!
         )
-        
-        // setup the motion manager
-        motionManager.deviceMotionUpdateInterval = 0.5
-        motionManager.startDeviceMotionUpdates(to: OperationQueue.current!, withHandler: userMotionHandler(data:error:))
         
         // start the ranging
         startPrediction()
@@ -181,22 +181,20 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         
         // the prediction with the model can fail due to invalid settings, i.e. when the settings were updated, but not the model
         do {
-            print("Attempting prediction...")
             // attempt to make a prediction
             let output = try model.prediction(from: RoomsMlModelInput(dense_1_input_output: mlModelInput))
-            print("Prediction succesful.")
+
             // get the predictions label
             let predRoom = String(output.featureValue(for: "classLabel")!.stringValue)
             
-            print("Predicted Room: \(predRoom)")
             // calculate the prediction accuracy rounded to one decimal place
             let predProb = round( Double( truncating: output.featureValue(for: "output1")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
             
+            print("Room \(predRoom), Likelihood \(predProb)")
+            print("This is \(fakeMove)")
             // if the prediction probability exceeds a threshold, accept the prediction
-            print("Prediction probability: \(predProb)")
             if predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove {
                 // update currentRoom
-                print("Updating Rooms")
                 currentRoom = String(predRoom)
                 print(currentRoom)
                 
@@ -204,11 +202,9 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
                 labelRoom.text = currentRoom
                 labelPredictionLikelyhood.text = String(format: "%.2f %%", arguments: [predProb])
                     
-                print("UI Elements updated...")
                 // send to mqtt broker
-                let json = ["room" : predRoom, "likelyhood": predProb] as [String : Any]
-                publishToMQTTServer(mqttConfig: mqttConfig, message: json)
-                print("Updated MQTT")
+                let json = ["room" : predRoom, "likelihood": predProb] as [String : Any]
+                publishToMQTTServer(mqttConfig: self.mqttConfig, message: json)
             }
         } catch {
             stopPrediction(labelRoomText: "Invalid Model!", labelPredictionLikelyhoodtext:  "Please update in Settings.")
@@ -218,14 +214,14 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
     // start prediction if the device enters the region
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         startPrediction()
-        let json = ["room" : "Home", "likelyhood": 100] as [String : Any]
+        let json = ["room" : "Home", "likelihood": 100] as [String : Any]
         publishToMQTTServer(mqttConfig: mqttConfig, message: json)
     }
     
     // stop prediction if the device leaves the region
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
         stopPrediction()
-        let json = ["room" : "Away", "likelyhood": 100] as [String : Any]
+        let json = ["room" : "Away", "likelihood": 100] as [String : Any]
         publishToMQTTServer(mqttConfig: mqttConfig, message: json)
     }
     
@@ -233,7 +229,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         /*
         This function monitors the user-acceleration
         */
-        fakeMove = false
+        //fakeMove = false
         let absAcceleration = round(vectorMagnitude(array: [ data!.userAcceleration.x, data!.userAcceleration.y, data!.userAcceleration.z ])*1e4)/1e4
         accelerationVector[0] = accelerationVector[1]
         accelerationVector[1] = absAcceleration
@@ -242,9 +238,10 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         
         if avgAcceleration >= accelerationThreshold {
             wasMovingUntil = Date()
+            fakeMove = false
         }
         
-        // if this update happens as a background-task, check the remaining time. If it is < 10s (good value??), start resume the beacon ranging
+        // if this update happens as a background-task, check the remaining time. If it is < 1s, start resume the beacon ranging
         switch UIApplication.shared.applicationState {
          case .active:
             // if it is in the foreground
