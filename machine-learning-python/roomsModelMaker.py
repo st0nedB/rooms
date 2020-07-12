@@ -19,11 +19,11 @@ from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import plot_confusion_matrix, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 # for learning
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-import keras.optimizers as optimizers
-import keras.losses as losses
-from keras_tqdm import TQDMCallback
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+import tensorflow.keras.optimizers as optimizers
+import tensorflow.keras.losses as losses
+#from keras_tqdm import TQDMCallback
 
 def get_options():
     description = ''
@@ -93,7 +93,7 @@ def parseData(jsondata, rooms, nsamples, lb) -> (np.array, np.array):
 
 def makeModel(inputshape, nlabels, actfunc):
     model = Sequential()
-    model.add(Dense(32, input_shape=(inputshape,)))
+    model.add(Dense(32, input_shape=inputshape))
     model.add(Dense(32, activation=actfunc))
     model.add(Dense(16, activation=actfunc))
     model.add(Dense(16, activation=actfunc))
@@ -111,7 +111,7 @@ def trainModel(model, X_train, Y_train, X_test, Y_test, nepochs, nbatch):
     if nbatch == 0:
         nbatch = X_train.shape[0]
         
-    model.fit(X_train, Y_train, epochs=nepochs, batch_size=nbatch, verbose=0, callbacks=[TQDMCallback()])
+    model.fit(X_train, Y_train, epochs=nepochs, batch_size=nbatch, verbose=0, callbacks=[])
     score = model.evaluate(X_test, Y_test)
     
     return model, score
@@ -128,20 +128,24 @@ def convertCoreML(keras_model, labelbinarizer):
     cleaned_path = "."
 
     class_labels = labelbinarizer.classes_.tolist()
+    mlconfig = coremltools.ClassifierConfig(class_labels)
 
     # load the trained convolutional neural network
-
-    model = coremltools.converters.keras.convert(
+    model = coremltools.convert(
                 keras_model,
-                input_names=["dense_1_input_output"],
-                class_labels=class_labels,
+                input_names=["dense_input"],
+                classifier_config=mlconfig,
                 )
 
+
     spec = model.get_spec()
+
     model.author = "Rooms - https://github.com/st0nedB/rooms"
     model.license = "MIT"
     model.short_description = "This model can be used to predict in which room a device resides based on BLE beacon measurements."
     model.versionString =  "Version 0.1"
+    model.input_description["dense_input"] = "Vector of input RSSI"
+    model.output_description["Identity"] = "Predicted Room"
     model.save(cleaned_path + "/" + modelName +  ".mlmodel")
     
 def serveHTTPFile(port):
@@ -178,10 +182,13 @@ if __name__ == "__main__":
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, shuffle=True, test_size=0.1)
     
     # setup and train the model 
-    mlmodel = makeModel(inputshape=X_train.shape[1], nlabels=len(rooms), actfunc=actfunc)
+    mlmodel = makeModel(inputshape=(X_train.shape[1],), nlabels=len(rooms), actfunc=actfunc)
     mlmodel, score = trainModel(model=mlmodel, X_train=X_train, X_test=X_test, Y_train=Y_train, Y_test=Y_test, nepochs=nepochs, nbatch=nbatch)
     logging.info("Model loss: {:.4f} \t Model accuracy: {:.4f} ".format(*score))
     #plotConfusionMatrix(ytest=Y, ypred=mlmodel.predict(X), labels=rooms) not working correctly right now
+    
+    # save tf.keras model
+    mlmodel.save("mlmodel.h5")
     
     # convert trained keras model to CoreML model, saved in rooms_coreml.mlmodel
     convertCoreML(keras_model=mlmodel, labelbinarizer=lbinarizer)
