@@ -182,20 +182,19 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         // the prediction with the model can fail due to invalid settings, i.e. when the settings were updated, but not the model
         do {
             // attempt to make a prediction
-            let output = try model.prediction(from: RoomsMlModelInput(dense_1_input_output: mlModelInput))
+            let output = try model.prediction(from: RoomsMlModelInput(dense_input: mlModelInput))
 
             // get the predictions label
             let predRoom = String(output.featureValue(for: "classLabel")!.stringValue)
-            
+
             // calculate the prediction accuracy rounded to one decimal place
-            let predProb = round( Double( truncating: output.featureValue(for: "output1")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
+            let predProb = round( Double( truncating: output.featureValue(for: "Identity")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
             
             print("Room \(predRoom), Likelihood \(predProb)")
             // if the prediction probability exceeds a threshold, accept the prediction
-            if predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove {
+            if (predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove) || currentRoom == "" {
                 // update currentRoom
                 currentRoom = String(predRoom)
-                print("Current Room \(currentRoom)")
                 
                 // Update the UI Elements
                 labelRoom.text = currentRoom
@@ -204,6 +203,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
                 // send to mqtt broker
                 let json = ["room" : predRoom, "likelihood": predProb] as [String : Any]
                 publishToMQTTServer(mqttConfig: self.mqttConfig, message: json)
+                print("MQTT updated")
             }
         } catch {
             stopPrediction(labelRoomText: "Invalid Model!", labelPredictionLikelyhoodtext:  "Please update in Settings.")

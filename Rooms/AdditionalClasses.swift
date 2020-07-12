@@ -57,7 +57,7 @@ class beaconData {
         Takes as input an array of Double values (e.g. the output of 'func processBeaconMeasurement'), and returns an MLMultiArray that can be fed to the ML Model for prediction.
         */
         let numValues = NSNumber(value: 1*numBeacons)
-        let mlArray = try? MLMultiArray(shape: [numValues], dataType: MLMultiArrayDataType.float32)
+        let mlArray = try? MLMultiArray(shape: [1, numValues], dataType: MLMultiArrayDataType.float32)
         let reduced = array
         
         for i in 0..<reduced.count {
@@ -268,24 +268,24 @@ public class RoomsMlModelInput : MLFeatureProvider {
     */
 
     // Input image in the format of CVPixelBuffer
-    public var dense_1_input_output: MLMultiArray
+    public var dense_input: MLMultiArray
 
     // Input feature name
     public var featureNames: Set<String> {
         get {
-            return ["dense_1_input_output"]
+            return ["dense_input"]
     }
     }
 
     // Value for a certain input feature.
     public func featureValue(for featureName: String) -> MLFeatureValue? {
-        if (featureName == "dense_1_input_output") {
-            return MLFeatureValue(multiArray: dense_1_input_output)
+        if (featureName == "dense_input") {
+            return MLFeatureValue(multiArray: dense_input)
         }
         return nil
     }
 
-    public init(dense_1_input_output: MLMultiArray) {
-        self.dense_1_input_output = dense_1_input_output
+    public init(dense_input: MLMultiArray) {
+        self.dense_input = dense_input
     }
 }
