@@ -96,3 +96,4 @@ iOSInjectionProject/
 misc/
 # macos-specific
 .DS_Store
+machine-learning-python/*.json
