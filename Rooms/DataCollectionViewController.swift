@@ -78,6 +78,8 @@ class DataCollectionViewController: UIViewController, CLLocationManagerDelegate 
     
         // empty the sample counter label
         sampleCounter.text = String()
+        
+        print(rooms)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -188,6 +190,7 @@ class DataCollectionViewController: UIViewController, CLLocationManagerDelegate 
         var files:[URL]
         var allAvailable:Bool
         (files, _, allAvailable) = dataFiles.checkDataAvailable(rooms: rooms)
+        /* TODO: Add an option to remove already existing json files when a room is deleted in the Settings>Rooms Viewcontroller. Otherwise this check will prohibit export of files!
         if !allAvailable {
             let alert = UIAlertController(title: "Missing Files!", message: "For some rooms no data has been recorded. They will not be part of the prediction.", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Default action"), style: .default, handler: { _ in
@@ -195,6 +198,7 @@ class DataCollectionViewController: UIViewController, CLLocationManagerDelegate 
             }))
             self.present(alert, animated: true, completion: nil)
         }
+        */
         let activityViewController = UIActivityViewController(activityItems: files, applicationActivities: nil)
         self.present(activityViewController, animated: true, completion: nil)
     }

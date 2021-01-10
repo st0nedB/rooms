@@ -6,19 +6,11 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-coremltools = "*"
-jupyterlab = "*"
 numpy = "*"
-scipy = "*"
-keras = "==2.2.4"
-h5py = "*"
-ipykernel = "*"
+scikit-learn = "<=0.19.2"
+coremltools = "==4.0b1"
+tensorflow = "*"
 matplotlib = "*"
-pandas = "*"
-seaborn = "*"
-sklearn = "*"
-tensorflow = "==1.15.2"
-keras-tqdm = "*"
 
 [requires]
 python_version = "3.7"

@@ -58,7 +58,9 @@ class ModelSettingsViewController: UIViewController, UITextFieldDelegate {
         compileProgressLabel.text = "33 %"
         
         // check if we can compile the model -> Error Code 1
+        
         guard let compiledModelURL = try? MLModel.compileModel(at: modelURL) else {
+            print("Failed to compile model!")
             return false
         }
         compileProgressLabel.text = "66 %"
