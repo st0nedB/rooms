@@ -185,10 +185,13 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
             let output = try model.prediction(from: RoomsMlModelInput(dense_input: mlModelInput))
 
             // get the predictions label
-            let predRoom = String(output.featureValue(for: "classLabel")!.stringValue)
+            let predRoom = String(output.featureValue(for: "Identity")!.stringValue)
 
             // calculate the prediction accuracy rounded to one decimal place
+            /*
             let predProb = round( Double( truncating: output.featureValue(for: "Identity")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
+            */
+            let predProb:Double = 90
             
             print("Room \(predRoom), Likelihood \(predProb)")
             // if the prediction probability exceeds a threshold, accept the prediction

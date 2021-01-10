@@ -34,6 +34,7 @@ class beaconData {
         
         // initialize some variables
         var array: [Double] = Array(repeating: 1, count: numBeacons)                        // array of numBeacons x singleBeaconMeasurement, 1 means the beacon is invisible (normalized with -100)
+
         var numSawBeacons: Int = 0                                                          // number of Beacons visible in the last measurement
         var beaconIdx: Int                                                                  // value in the beaconDict
         // iterate over the found beacons and obtain RSSI
@@ -57,7 +58,7 @@ class beaconData {
         Takes as input an array of Double values (e.g. the output of 'func processBeaconMeasurement'), and returns an MLMultiArray that can be fed to the ML Model for prediction.
         */
         let numValues = NSNumber(value: 1*numBeacons)
-        let mlArray = try? MLMultiArray(shape: [1, numValues], dataType: MLMultiArrayDataType.float32)
+        let mlArray = try? MLMultiArray(shape: [numValues,], dataType: MLMultiArrayDataType.float32)
         let reduced = array
         
         for i in 0..<reduced.count {
@@ -133,9 +134,12 @@ class trainingDataFiles {
         }
 
         if files.containsSameElements(as: rooms) {
-           allAvailable = true
+            allAvailable = true
         } else {
             allAvailable = false
+            let difference = files.difference(from: rooms)
+            print(rooms)
+            print(difference)
         }
 
         return ( fileURLs, path, allAvailable )
@@ -258,6 +262,17 @@ extension Array where Element: Comparable {
     */
     func containsSameElements(as other: [Element]) -> Bool {
         return self.count == other.count && self.sorted() == other.sorted()
+    }
+}
+
+extension Array where Element: Hashable {
+    /*
+     This extension is used to compare two arrays of strings and list the differences
+     */
+    func difference(from other: [Element]) -> [Element] {
+        let thisSet = Set(self)
+        let otherSet = Set(other)
+        return Array(thisSet.symmetricDifference(otherSet))
     }
 }
 

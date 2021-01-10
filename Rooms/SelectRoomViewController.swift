@@ -47,7 +47,7 @@ class SelectRoomsViewController: UIViewController, UITextFieldDelegate {
             if !file.isEmpty {
                 let data = try Data(contentsOf: file[0], options: .mappedIfSafe)
                 let json = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-                let measurements = json as? Array<Array<Double>> // TODO: caution, this likely need change
+                let measurements = json as? Array<Array<Double>>
                 // now parse the dimensions of the array
                 let numBeacons = measurements![0].count
                 let numMeasurements = measurements!.count

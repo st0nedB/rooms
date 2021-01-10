@@ -28,6 +28,11 @@ class ManageRoomsViewController: UIViewController {
         // load user default rooms
         rooms = defaults.object(forKey: "rooms") as? [String] ?? [String()]
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        defaults.set(rooms, forKey: "rooms")
+        print(defaults.object(forKey: "rooms") as! [String])
+    }
 
     @IBAction func addNewRoomButton(_ sender: UIButton) {
         insertNewRoom()
