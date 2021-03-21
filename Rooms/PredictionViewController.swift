@@ -188,26 +188,33 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
             let predRoom = String(output.featureValue(for: "Identity")!.stringValue)
 
             // calculate the prediction accuracy rounded to one decimal place
-            /*
-            let predProb = round( Double( truncating: output.featureValue(for: "Identity")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
-            */
-            let predProb:Double = 90
-            
-            print("Room \(predRoom), Likelihood \(predProb)")
+            let predProb = round( Double( truncating: output.featureValue(for: "classProbability")!.dictionaryValue[AnyHashable(predRoom)]! )*1000)/10
+
             // if the prediction probability exceeds a threshold, accept the prediction
-            if (predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove) || currentRoom == "" {
+            if(labelRoom.text == "Starting...") {
+                labelRoom.text = currentRoom
+            }
+
+            /* Conditions to accept a prediction
+            1. The new prediction probability is larger than the set threshold AND
+            2. The new predicted room is different from the previous one AND
+            3. It is not a fake move
+            OR
+            1. The app just made its first prediction and the labelRoom is empty ("")
+            */
+            if (predProb > predictionThreshold*100 && currentRoom != String(predRoom) && !fakeMove) || currentRoom == ""{
                 // update currentRoom
+                labelPredictionLikelyhood.text = String(format: "%.2f %%", arguments: [predProb])
                 currentRoom = String(predRoom)
-                
+
                 // Update the UI Elements
                 labelRoom.text = currentRoom
-                labelPredictionLikelyhood.text = String(format: "%.2f %%", arguments: [predProb])
-                    
+                
                 // send to mqtt broker
                 let json = ["room" : predRoom, "likelihood": predProb] as [String : Any]
                 publishToMQTTServer(mqttConfig: self.mqttConfig, message: json)
-                print("MQTT updated")
             }
+
         } catch {
             stopPrediction(labelRoomText: "Invalid Model!", labelPredictionLikelyhoodtext:  "Please update in Settings.")
         }
