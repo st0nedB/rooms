@@ -122,9 +122,9 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         
-        if CLLocationManager.authorizationStatus() != .authorizedAlways {
+        if locationManager.authorizationStatus != .authorizedAlways {
             // add a UI info to show that background monitoring is not enabled
-            print(CLLocationManager.authorizationStatus())
+            print(locationManager.authorizationStatus)
         }
         
         // this ensures the ranging works properly in background
@@ -320,7 +320,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.startRangingBeacons(satisfying: CLBeaconIdentityConstraint(uuid: uuid, major: major))
         
         // if always position is authorized, use it
-        if CLLocationManager.authorizationStatus() == .authorizedAlways {
+        if locationManager.authorizationStatus == .authorizedAlways {
             locationManager.startUpdatingLocation()
             beaconRaningState = 1
         }
@@ -343,7 +343,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         */
         locationManager.stopRangingBeacons(satisfying: CLBeaconIdentityConstraint(uuid: uuid, major: major))
         // if always position is authorized, disable it
-        if CLLocationManager.authorizationStatus() == .authorizedAlways {
+        if locationManager.authorizationStatus == .authorizedAlways {
             locationManager.stopUpdatingLocation()
             beaconRaningState = 3
         }
@@ -367,7 +367,7 @@ class PredictionViewController: UIViewController, CLLocationManagerDelegate {
         */
         locationManager.stopRangingBeacons(satisfying: CLBeaconIdentityConstraint(uuid: uuid, major: major))
         // if always position is authorized, disable it
-        if CLLocationManager.authorizationStatus() == .authorizedAlways {
+        if locationManager.authorizationStatus == .authorizedAlways {
             locationManager.stopUpdatingLocation()
             beaconRaningState = 2
         }
