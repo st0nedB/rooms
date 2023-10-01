@@ -23,7 +23,7 @@ It is not possible for the iBeacons to detect if a device is performing self-loc
 
 To perform the RSSI sensing and ML inference, the app must run in the background. 
 As Apple App Store guidelines restrict this, the app can not be published on the official App Store.
-Therefore, ** to use `rooms` you need to download and compile it yourself. **
+Therefore, **to use `rooms` you need to download and compile it yourself**.
 For more inforation on power consumption and system utilization, please refer to the "Additional Information" section below.
 
 # Getting Started
