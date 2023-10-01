@@ -1,16 +1,30 @@
-### Update:
-In my current situation I do not have time to keep `rooms` updated. 
-Please consider this project a `proof-of-concept`.
+### Update
+Currently I do not have time to keep `rooms` updated. 
+Please consider this project should be considered a `proof-of-concept`.
 If you would like to contribute to further development, please contact me or open an issue. 
 
 # `rooms`
+**TL;DR** Another way to perform room presence detection based on low-cost BLE beacons for mobile devices. MQTT support for smart-home integration. iOS only.
 
 With `rooms` mobile devices can perform indoor self-localization using an app and low-cost BLE beacons.
 Its focus is the localization of mobile devices using low-cost COTS (commercial-off-the-shelf) hardware, e.g., the ESP32. 
 By configuring and deploying multiple ESP32's as iBeacon transmitters into a region (e.g. an apartment, house, etc.), a mobile app on the device can detect in which room/area of the region the device currently is. 
 It then uses MQTT to publish the determined region to an MQTT broker. 
-The current room is estimated from the RSSI values obtained from all beacons in range.
-![how-it-works](./docs/images/explanaition.png)
+The current room is estimated from the combination of RSSI values obtained from all beacons in range (RSSI fingerprinting) using a Machine Learning model.
+![how-it-works](./docs/media/explanaition.png)
+
+Here is a neat little demo with two rooms.
+The device is moved from the `Badezimmer` (bathroom in german) to the `Flur` (hallway in german) and back. 
+As you can see, `rooms` is able to quickly detect the change of the device location.
+![demo](./docs/media/demo.gif)
+
+The prediction runs entirely on the device, giving full control to the user about if and how the data is shared. 
+It is not possible for the iBeacons to detect if a device is performing self-localization with `rooms` or not. 
+
+To perform the RSSI sensing and ML inference, the app must run in the background. 
+As Apple App Store guidelines restrict this, the app can not be published on the official App Store.
+Therefore, ** to use `rooms` you need to download and compile it yourself. **
+For more inforation on power consumption and system utilization, please refer to the "Additional Information" section below.
 
 # Getting Started
 
@@ -83,3 +97,18 @@ Finally, go to the initial __Prediction__ tab.
 Wait for a few seconds to allow the app to compile your model and start collecting readings from your BLE beacons. 
 After a few seconds it should show in which room you are currently in. 
 If you configured MQTT, a new message will be published to the configured topic every time the room changes.
+
+# Additional Information
+
+Here are some results of the resource impact of the approach on your device (e.g., CPU usage, battery impact).
+![App Stats](./docs/media/power_consumption.png)
+
+To reduce power consumption, beacon measurements are only collected if the device is moved. 
+For movement detection movement, the app monitors the devices’ gyroscope.
+To avoid accidentally draining the device battery, `rooms` suspends all activities when the device battery goes below 30% and the device is not charging.
+
+More discussions of the approach are available on [this](https://community.home-assistant.io/t/area-room-presence-detection-for-mobile-devices-using-esp32-based-ble-beacons/202622/21) Home-Assistant forum post. 
+
+## Future
+RSSI is not a real high-value wireless channel feature, just the best we can get with cheap hardware and reasonable effort at the moment.
+I think with better hardware, more advanced wireless channel features for the learning, e.g., multipath-parameters, or time-difference of arrival.
