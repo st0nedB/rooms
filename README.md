@@ -15,7 +15,7 @@ The current room is estimated from the combination of RSSI values obtained from 
 
 Here is a neat little demo with two rooms.
 The device is moved from the `Badezimmer` (bathroom in german) to the `Flur` (hallway in german) and back. 
-As you can see, `rooms` is able to quickly detect the change of the device location.
+As you can see, `rooms` is able to quickly detect the change of the device location.  
 ![demo](./docs/media/demo.gif)
 
 The prediction runs entirely on the device, giving full control to the user about if and how the data is shared. 
